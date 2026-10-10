@@ -141,7 +141,7 @@
         <div class="form-group">
             <label>شماره همراه (اختیاری):</label>
             <input type="tel" id="phone" placeholder="09123456789">
-            <span class="optional-hint">* صرفاً جهت برقراری تماس برای اهدای جایزه به ۵ نفر برتر</span>
+            <span class="optional-hint">* صرفاً جهت برقراری تماس برای اهدای جایزه به نفرات برتر</span>
         </div>
         <button class="btn-submit" onclick="startQuiz()">شروع مسابقه</button>
     </div>
@@ -162,6 +162,7 @@
         <h3>پایان مسابقه!</h3>
         <p id="result-message" style="font-size: 15px; margin: 20px 0; line-height: 1.8;"></p>
         <p style="color: #6b7280; font-size: 12px;">امتیاز شما ثبت شد. با تشکر از شرکت شما!</p>
+        <p style="color: #6b7280; font-size: 12px;"><a herf="ble.ir/join/7SY4ghfLX4">گروه علمی فرهنگی فانوس</a></p>
     </div>
 </div>
 
@@ -1062,7 +1063,7 @@
         
         document.getElementById("result-message").innerHTML = `
             کاربر عزیز: <b>${userData.name}</b><br>
-            امتیاز شما: <b>${score}</b> از <b>${questions.length * 10}</b>
+            امتیاز شما: <b>${score}</b>
         `;
 
         if (googleScriptURL !== "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE") {
