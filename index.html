@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مسابقه بزرگداشت حافظ</title>
+    <!-- اتصال مستقیم به فونت وزیرمتن -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #5b21b6;
+            --secondary-color: #7c3aed;
+            --correct-color: #10b981;
+            --wrong-color: #ef4444;
+            --bg-color: #f3e8ff;
+            --text-color: #1f2937;
+        }
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background: linear-gradient(135deg, #f3e8ff, #ddd6fe);
+            color: var(--text-color);
+            margin: 0;
+            padding: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+        .container {
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 480px;
+            box-sizing: border-box;
+        }
+        h2 { text-align: center; color: var(--primary-color); margin-top: 0; margin-bottom: 15px; font-weight: 700; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 14px; }
+        input[type="text"], input[type="tel"] {
+            width: 100%;
+            padding: 12px;
+            border: 1.5px solid #d1d5db;
+            border-radius: 10px;
+            box-sizing: border-box;
+            font-family: 'Vazirmatn', sans-serif;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        input:focus { border-color: var(--primary-color); }
+        .optional-hint { font-size: 11px; color: #6b7280; margin-top: 4px; display: block; }
+        button.btn-submit {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px;
+            width: 100%;
+            border-radius: 10px;
+            font-family: 'Vazirmatn', sans-serif;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-top: 10px;
+        }
+        button.btn-submit:hover { background: var(--secondary-color); }
+        .hidden { display: none !important; }
+        .quiz-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #4b5563;
+        }
+        .question-text { font-size: 17px; font-weight: 700; margin-bottom: 20px; line-height: 1.7; text-align: justify; }
+        
+        .options { display: flex; flex-direction: column; gap: 10px; }
+        .options button {
+            background: #f9fafb;
+            color: var(--text-color);
+            border: 1.5px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 12px 15px;
+            font-family: 'Vazirmatn', sans-serif;
+            font-size: 14px;
+            text-align: right;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .options button:hover:not(:disabled) {
+            background: #f3f4f6;
+            border-color: var(--primary-color);
+        }
+        /* استایل‌های وضعیت پاسخ صحیح و غلط */
+        .options button.correct {
+            background-color: var(--correct-color) !important;
+            color: white !important;
+            border-color: var(--correct-color) !important;
+        }
+        .options button.wrong {
+            background-color: var(--wrong-color) !important;
+            color: white !important;
+            border-color: var(--wrong-color) !important;
+        }
+
+        .timer-bar {
+            height: 6px;
+            background: #e5e7eb;
+            border-radius: 3px;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+        .timer-progress {
+            height: 100%;
+            background: var(--primary-color);
+            width: 100%;
+            transition: width 1s linear;
+        }
+        .result-box { text-align: center; }
+        .result-box h3 { font-size: 22px; color: var(--primary-color); margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- صفحه ورود -->
+    <div id="register-screen">
+        <h2>مسابقه بزرگداشت حافظ</h2>
+        <p style="text-align: center; font-size: 13px; color: #6b7280; margin-bottom: 20px;">مشخصات خود را وارد کنید تا مسابقه شروع شود.</p>
+        <div class="form-group">
+            <label>نام و نام خانوادگی:</label>
+            <input type="text" id="name" placeholder="مثال: علی رضایی">
+        </div>
+        <div class="form-group">
+            <label>شماره همراه (اختیاری):</label>
+            <input type="tel" id="phone" placeholder="09123456789">
+            <span class="optional-hint">* صرفاً جهت برقراری تماس برای اهدای جایزه به ۵ نفر برتر</span>
+        </div>
+        <button class="btn-submit" onclick="startQuiz()">شروع مسابقه</button>
+    </div>
+
+    <!-- صفحه آزمون -->
+    <div id="quiz-screen" class="hidden">
+        <div class="quiz-header">
+            <span id="question-number">سوال ۱</span>
+            <span id="lives">جان باقی‌مانده: ❤️❤️</span>
+        </div>
+        <div class="timer-bar"><div class="timer-progress" id="timer-progress"></div></div>
+        <div class="question-text" id="question-text">متن سوال...</div>
+        <div class="options" id="options-container"></div>
+    </div>
+
+    <!-- صفحه پایان -->
+    <div id="result-screen" class="hidden result-box">
+        <h3>پایان مسابقه!</h3>
+        <p id="result-message" style="font-size: 15px; margin: 20px 0; line-height: 1.8;"></p>
+        <p style="color: #6b7280; font-size: 12px;">امتیاز شما ثبت شد. با تشکر از شرکت شما!</p>
+    </div>
+</div>
+
+<script>
+    const originalQuestions = [
+        {
+            q: "تخلص شعر حافظ چه بود و به چه معناست؟",
+            options: ["حافظ - نگه‌دارنده قرآن در حافظه", "لسان‌الغیب - زبان غیب", "خواجه - بزرگ زاده", "حافظ - به یاد آورنده اشعار"],
+            answer: 0
+        },
+        {
+            q: "کدام پادشاه یا سلسله با حافظ هم‌عصر بود؟",
+            options: ["صفویان", "آل مظفر", "غزنویان", "قاجاریه"],
+            answer: 1
+        },
+        {
+            q: "مزار حافظ در کدام آرامگاه معروف قرار دارد؟",
+            options: ["نیشابور - آرامگاه عطار", "شیراز - حافظیه", "تهران - ابن بابویه", "طوس - آرامگاه فردوسی"],
+            answer: 1
+        },
+        {
+            q: "مفهوم اصلی اصطلاح «رند» در اشعار حافظ چیست؟",
+            options: ["فردی بی‌بند و بار", "انسان روشن‌بین، آزاداندیش و بی‌ریا", "شاعر دربار پادشاهان", "فردی منزوی و گوشه‌نشین"],
+            answer: 1
+        },
+        {
+            q: "جمع‌آوری و تدوین دیوان حافظ پس از مرگ او توسط چه کسی انجام شد؟",
+            options: ["خود حافظ در زمان حیات", "خواجه عمادالدین", "محمد گل‌اندام", "شاه اسماعیل صفوی"],
+            answer: 2
+        }
+    ];
+
+    let questions = [];
+    let currentQuestionIndex = 0;
+    let lives = 2;
+    let score = 0;
+    let timer;
+    let timeLeft = 15;
+    let userData = { name: "", phone: "" };
+    let isAnsweringBlocked = false;
+
+    const googleScriptURL = "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE";
+
+    // تابع برای بر زدن و تصادفی کردن لیست سوالات (Fisher-Yates Shuffle)
+    function shuffleArray(array) {
+        let shuffled = [...array];
+        for (let i = shuffled.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+        return shuffled;
+    }
+
+    function startQuiz() {
+        const nameInput = document.getElementById("name").value.trim();
+        const phoneInput = document.getElementById("phone").value.trim();
+
+        if(!nameInput) {
+            alert("لطفاً نام و نام خانوادگی خود را وارد کنید.");
+            return;
+        }
+
+        userData.name = nameInput;
+        userData.phone = phoneInput || "ثبت نشده";
+
+        // تصادفی‌سازی سوالات برای هر کاربر
+        questions = shuffleArray(originalQuestions);
+
+        document.getElementById("register-screen").classList.add("hidden");
+        document.getElementById("quiz-screen").classList.remove("hidden");
+        loadQuestion();
+    }
+
+    function loadQuestion() {
+        if (currentQuestionIndex >= questions.length || lives <= 0) {
+            endQuiz();
+            return;
+        }
+
+        isAnsweringBlocked = false;
+        clearInterval(timer);
+        timeLeft = 15;
+        document.getElementById("timer-progress").style.width = "100%";
+        startTimer();
+
+        const q = questions[currentQuestionIndex];
+        document.getElementById("question-number").innerText = `سوال ${currentQuestionIndex + 1} از ${questions.length}`;
+        document.getElementById("lives").innerText = `جان باقی‌مانده: ${'❤️'.repeat(lives)}`;
+        document.getElementById("question-text").innerText = q.q;
+
+        const optionsContainer = document.getElementById("options-container");
+        optionsContainer.innerHTML = "";
+
+        q.options.forEach((opt, index) => {
+            const btn = document.createElement("button");
+            btn.innerText = opt;
+            btn.onclick = () => checkAnswer(index, btn);
+            optionsContainer.appendChild(btn);
+        });
+    }
+
+    function startTimer() {
+        const progressBar = document.getElementById("timer-progress");
+        timer = setInterval(() => {
+            timeLeft--;
+            let percentage = (timeLeft / 15) * 100;
+            progressBar.style.width = percentage + "%";
+
+            if (timeLeft <= 0) {
+                clearInterval(timer);
+                handleTimeOut();
+            }
+        }, 1000);
+    }
+
+    function checkAnswer(selectedIndex, selectedBtn) {
+        if (isAnsweringBlocked) return;
+        isAnsweringBlocked = true;
+        clearInterval(timer);
+
+        const q = questions[currentQuestionIndex];
+        const buttons = document.querySelectorAll("#options-container button");
+
+        // غیرفعال کردن تمام دکمه‌ها
+        buttons.forEach(btn => btn.disabled = true);
+
+        if (selectedIndex === q.answer) {
+            selectedBtn.classList.add("correct");
+            score += 10;
+            setTimeout(() => {
+                currentQuestionIndex++;
+                loadQuestion();
+            }, 1000);
+        } else {
+            selectedBtn.classList.add("wrong");
+            // نشان دادن گزینه صحیح جهت راهنمایی
+            buttons[q.answer].classList.add("correct");
+            lives--;
+            setTimeout(() => {
+                currentQuestionIndex++;
+                loadQuestion();
+            }, 1200);
+        }
+    }
+
+    function handleTimeOut() {
+        if (isAnsweringBlocked) return;
+        isAnsweringBlocked = true;
+        
+        const q = questions[currentQuestionIndex];
+        const buttons = document.querySelectorAll("#options-container button");
+        buttons.forEach(btn => btn.disabled = true);
+        
+        // هایلایت گزینه درست به کاربر
+        buttons[q.answer].classList.add("correct");
+        lives--;
+
+        setTimeout(() => {
+            currentQuestionIndex++;
+            loadQuestion();
+        }, 1200);
+    }
+
+    function endQuiz() {
+        clearInterval(timer);
+        document.getElementById("quiz-screen").classList.add("hidden");
+        document.getElementById("result-screen").classList.remove("hidden");
+        
+        document.getElementById("result-message").innerHTML = `
+            کاربر عزیز: <b>${userData.name}</b><br>
+            امتیاز شما: <b>${score}</b> از <b>${questions.length * 10}</b>
+        `;
+
+        if (googleScriptURL !== "https://script.google.com/macros/s/AKfycbz9Y2-sLjlOMqm0JnDMsiWrvVHz9fwd0HHVc_NpcTyRafJMGQOHgkgmrHpKSvKd3K5-0Q/exec") {
+            fetch(googleScriptURL, {
+                method: "POST",
+                mode: "no-cors",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    name: userData.name,
+                    phone: userData.phone,
+                    score: score
+                })
+            }).catch(err => console.log(err));
+        }
+    }
+</script>
+
+</body>
+</html>
