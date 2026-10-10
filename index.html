@@ -203,7 +203,7 @@
     let userData = { name: "", phone: "" };
     let isAnsweringBlocked = false;
 
-    const googleScriptURL = "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE";
+    const googleScriptURL = "https://script.google.com/macros/s/AKfycbz9Y2-sLjlOMqm0JnDMsiWrvVHz9fwd0HHVc_NpcTyRafJMGQOHgkgmrHpKSvKd3K5-0Q/exec";
 
     // تابع برای بر زدن و تصادفی کردن لیست سوالات (Fisher-Yates Shuffle)
     function shuffleArray(array) {
@@ -335,7 +335,7 @@
             امتیاز شما: <b>${score}</b> از <b>${questions.length * 10}</b>
         `;
 
-        if (googleScriptURL !== "https://script.google.com/macros/s/AKfycbz9Y2-sLjlOMqm0JnDMsiWrvVHz9fwd0HHVc_NpcTyRafJMGQOHgkgmrHpKSvKd3K5-0Q/exec") {
+        if (googleScriptURL !== "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE") {
             fetch(googleScriptURL, {
                 method: "POST",
                 mode: "no-cors",
